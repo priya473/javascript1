@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<h1>How to trace location</h1>
+	<button onclick="geoLocation()">Get Location</button>
+	<div id="output"></div>
+
+	<script type="text/javascript">
+		var x=document.getElementById('output');
+
+		function geoLocation()
+		{
+			//alert("Hello");//for testing purpose
+			if(navigator.geolocation)
+			{
+				//x.innerHTML="Supporting!!";
+				navigator.geolocation.getCurrentPosition(showPosition, showError);
+			}
+			else
+			{
+				x.innerHTML="Not Supporting!!";
+			}
+			//we will print here values we got in position object
+			function showPosition(position)
+			{
+				var localAPI="http://maps.googleapis.com/maps/api/geocode/json?latlng="+position.coords.latitude+","+position.coords.longitude+"&sensor=true";
+
+				x.innerHTML=localAPI;
+				$.get({
+					//it takes object.we will pass url through object
+					url : localAPI,
+					success:function(data)
+					{
+						console.log(data);
+
+						x.innerHTML=data.result[0].address_components[4].long_name+",";
+						x.innerHTML+=data.result[0].address_components[5].long_name+",";
+						x.innerHTML+=data.result[0].address_components[6].long_name+",";
+
+					}
+				});
+			}
+		}//end of function geoLocation
+		// now we will write code if it unsuccessful then how to handle
+		/*
+		we recieve 4 type of errors
+		0=UNKNOWN_ERROR
+		1=PERMISSION_DENTED(means user denied to share location)
+		2=POSITION_UNAVAILABLE
+		3=TIMEOUT(API's response is time out)
+		we will use error code and will dynamically find errors
+		*/
+		function showError(error)
+		{
+			switch(error.code)
+			{
+				case error.PERMISSION_DENTED:
+				x.innerHTML="User denied the request for Geolocation."
+				break;
+
+				case error.POSITION_UNAVAILABLE:
+				x.innerHTML="Location information is unavailable."
+				break;
+
+				case error.TIMEOUT:
+				x.innerHTML="The request to get user location time out."
+				break;
+
+				case error.UNKNOWN_ERROR:
+				x.innerHTML="An unknown error occurred."
+				break;
+			}
+		}
+	</script>
+</body>
+</html>
